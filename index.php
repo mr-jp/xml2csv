@@ -4,8 +4,11 @@ spl_autoload_register(function ($class_name) {
     include $class_name . '.php';
 });
 
+$inputFileName = $argv[0];
+$outputFileName = $argv[1];
+
 // Read from File
-$source = new FileReader("sample50.xml");
+$source = new FileReader($inputFileName);
 
 // Parse to XML
 $xmlParser = new XmlParser($source);
@@ -35,4 +38,4 @@ $fields = [
 
 // Convert to CSV and write to file
 $csvFromXml = new CsvFromXml($xml, $fields, $delimiter = ",", $enclosure = "^");
-$csvFromXml->write("filename.csv");
+$csvFromXml->write($outputFileName);
