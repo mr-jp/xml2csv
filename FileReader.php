@@ -12,6 +12,8 @@ class FileReader implements InputInterface
     public function read()
     {
         $resource = fopen($this->filename, "r") or die("Unable to open file!");
-        return fread($resource, filesize($this->filename));
+        $contents = fread($resource, filesize($this->filename));
+        fclose($resource);
+        return $contents;
     }
 }
