@@ -72,6 +72,7 @@ class CsvFromXml
     public function write(String $filename)
     {
         $resource = fopen($filename, 'w');
+        fprintf($resource, chr(0xEF).chr(0xBB).chr(0xBF));
 
         //output header row
         $firstItem = $this->csvArray[0];

@@ -17,7 +17,7 @@ class CsvFromXmlOgs extends CsvFromXml
             $csvRow = [];
 
             //Special case for Issue Id
-            $issueRow['Issue Id'] = (string) $issue->attributes()->id;
+            $csvRow['Issue Id'] = (string) $issue->attributes()->id;
 
             //Gather all items from the XML into issueRow
             foreach ($issue->field as $fieldObject) {
