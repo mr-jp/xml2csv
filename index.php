@@ -4,8 +4,8 @@ spl_autoload_register(function ($class_name) {
     include $class_name . '.php';
 });
 
-$inputFileName = $argv[0];
-$outputFileName = $argv[1];
+$inputFileName = $argv[1];
+$outputFileName = $argv[2];
 
 // Read from File
 $source = new FileReader($inputFileName);
