@@ -11,7 +11,7 @@ $source = new FileReader("sample50.xml");
 $xmlParser = new XmlParser($source);
 $xml = $xmlParser->parse();
 
-//define fields [key and value]
+//define fields [key and value] to read from XML and convert to CSV columns
 $fields = [
     'projectShortName' => 'Project',
     'summary' => 'Summary',

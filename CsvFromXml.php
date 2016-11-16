@@ -19,6 +19,11 @@ class CsvFromXml
         $this->escape_char = $escape_char;
     }
 
+    /**
+     * Convert data for Youtrack API from XML to CSV
+     * @param  SimpleXMLElement $xml XML object
+     * @return void
+     */
     private function convertData(SimpleXMLElement $xml)
     {
         // MyHelper::fPrint($xml);exit;
