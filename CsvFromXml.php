@@ -20,7 +20,7 @@ class CsvFromXml
     }
 
     /**
-     * Convert data for Youtrack API from XML to CSV
+     * Convert data for XML to CSV
      * @param  SimpleXMLElement $xml XML object
      * @return void
      */
@@ -30,15 +30,26 @@ class CsvFromXml
         $csvArray = [];
 
         foreach ($issues as $issue) {
+            $issueRow = [];
             $csvRow = [];
 
+            //Gather all items from the XML into issueRow
             foreach ($issue->field as $fieldObject) {
                 $fieldName = (string) $fieldObject->attributes()->name;
-                if (array_key_exists($fieldName, $this->fields)) {
-                    $header = $this->fields[$fieldName];
-                    $value = (string) $fieldObject->value;
-                    $this->processRow($csvRow, $header, $value);
+                $value = (string) $fieldObject->value;
+                $issueRow[$fieldName] = $value;
+            }
+
+            //Loop through all fields, we need to add them to CSV even though there is no row in XML
+            foreach ($this->fields as $fieldName => $header) {
+                if (array_key_exists($fieldName, $issueRow)) {
+                    $value = $issueRow[$fieldName];
+                } else {
+                    $value = "";
                 }
+
+                //Add to csvRow
+                $this->processRow($csvRow, $header, $value);
             }
 
             $csvArray[] = $csvRow;

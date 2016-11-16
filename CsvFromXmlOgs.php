@@ -13,18 +13,29 @@ class CsvFromXmlOgs extends CsvFromXml
         $csvArray = [];
 
         foreach ($issues as $issue) {
+            $issueRow = [];
             $csvRow = [];
 
             //Special case for Issue Id
-            $csvRow['Issue Id'] = (string) $issue->attributes()->id;
+            $issueRow['Issue Id'] = (string) $issue->attributes()->id;
 
+            //Gather all items from the XML into issueRow
             foreach ($issue->field as $fieldObject) {
                 $fieldName = (string) $fieldObject->attributes()->name;
-                if (array_key_exists($fieldName, $this->fields)) {
-                    $header = $this->fields[$fieldName];
-                    $value = (string) $fieldObject->value;
-                    $this->processRow($csvRow, $header, $value);
+                $value = (string) $fieldObject->value;
+                $issueRow[$fieldName] = $value;
+            }
+
+            //Loop through all fields, we need to add them to CSV even though there is no row in XML
+            foreach ($this->fields as $fieldName => $header) {
+                if (array_key_exists($fieldName, $issueRow)) {
+                    $value = $issueRow[$fieldName];
+                } else {
+                    $value = "";
                 }
+
+                //Add to csvRow
+                $this->processRow($csvRow, $header, $value);
             }
 
             $csvArray[] = $csvRow;
@@ -41,15 +52,30 @@ class CsvFromXmlOgs extends CsvFromXml
     protected function processRow(&$csvRow, $header, $value)
     {
         $string = $newValue = $value;
-        $jiraResolution = 'nicht erledigt';
 
-        // if ($header == 'State') {
-        //     switch ($value) {
-        //         case "Transported":
-        //         case "Obsolete":
-        //         case "Duplicate":
-        //     }
-        // }
+        if ($header == 'State') {
+            switch ($value) {
+                case "Transported":
+                    $newValue = 'Closed';
+                    $resolution = 'Behoben';
+                    $csvRow["Resolution"] = 'Behoben';
+                    break;
+
+                case "Obsolete":
+                    $newValue = 'Closed';
+                    $csvRow["Resolution"] = 'Wird nicht behoben';
+                    break;
+
+                case "Duplicate":
+                    $newValue = 'Closed';
+                    $csvRow["Resolution"] = 'Duplikat';
+                    break;
+
+                default:
+                    $csvRow["Resolution"] = 'nicht erledigt';
+                    break;
+            }
+        }
 
         //Add to the row
         $csvRow[$header] = $newValue;
