@@ -37,5 +37,6 @@ $fields = [
 ];
 
 // Convert to CSV and write to file
-$csvFromXml = new CsvFromXml($xml, $fields, $delimiter = ",", $enclosure = "^");
+// $csvFromXml = new CsvFromXml($xml, $fields, $delimiter = ",", $enclosure = "^");
+$csvFromXml = new CsvFromXmlOgs($xml, $fields, $delimiter = ",", $enclosure = "^");
 $csvFromXml->write($outputFileName);

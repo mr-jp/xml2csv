@@ -1,24 +1,7 @@
 <?php
 
-class CsvFromXml
+class CsvFromXmlOgs extends CsvFromXml
 {
-    protected $xml;
-    protected $fields;
-    protected $csvArray;
-    protected $delimiter;
-    protected $enclosure;
-    protected $escape_char;
-
-    public function __construct(SimpleXMLElement $xml, array $fields = [], string $delimiter = ",", string $enclosure = '"', string $escape_char = '\\')
-    {
-        $this->xml = $xml;
-        $this->fields = $fields;
-        $this->convertData($this->xml);
-        $this->delimiter = $delimiter;
-        $this->enclosure = $enclosure;
-        $this->escape_char = $escape_char;
-    }
-
     /**
      * Convert data for Youtrack API from XML to CSV
      * @param  SimpleXMLElement $xml XML object
@@ -31,6 +14,9 @@ class CsvFromXml
 
         foreach ($issues as $issue) {
             $csvRow = [];
+
+            //Special case for Issue Id
+            $csvRow['Issue Id'] = (string) $issue->attributes()->id;
 
             foreach ($issue->field as $fieldObject) {
                 $fieldName = (string) $fieldObject->attributes()->name;
@@ -47,7 +33,7 @@ class CsvFromXml
     }
 
     /**
-     * Some items have special rules (should be overridden in children classes)
+     * Some items have special rules
      * @param  array &$csvRow The current row
      * @param  string $header Header name
      * @param  string $value  Value of the item
@@ -55,23 +41,17 @@ class CsvFromXml
     protected function processRow(&$csvRow, $header, $value)
     {
         $string = $newValue = $value;
+        $jiraResolution = 'nicht erledigt';
+
+        // if ($header == 'State') {
+        //     switch ($value) {
+        //         case "Transported":
+        //         case "Obsolete":
+        //         case "Duplicate":
+        //     }
+        // }
+
+        //Add to the row
         $csvRow[$header] = $newValue;
-    }
-
-    public function write(String $filename)
-    {
-        $resource = fopen($filename, 'w');
-
-        //output header row
-        $firstItem = $this->csvArray[0];
-        fputcsv($resource, array_keys($firstItem), $this->delimiter, $this->enclosure, $this->escape_char);
-
-        //output data
-        foreach ($this->csvArray as $row) {
-            fputcsv($resource, $row, $this->delimiter, $this->enclosure, $this->escape_char);
-        }
-
-        //Close resource
-        fclose($resource);
     }
 }
