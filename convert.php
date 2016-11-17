@@ -4,6 +4,7 @@ spl_autoload_register(function ($class_name) {
     include $class_name . '.php';
 });
 
+//Console arguments
 $inputFileName = $argv[1];
 $outputFileName = $argv[2];
 
@@ -38,5 +39,5 @@ $fields = [
 
 // Convert to CSV and write to file
 // $csvFromXml = new CsvFromXml($xml, $fields, $delimiter = ",", $enclosure = "^");
-$csvFromXml = new CsvFromXmlOgs($xml, $fields, $delimiter = ",", $enclosure = "^");
+$csvFromXml = new CsvFromXmlOgs($xml, $fields, $delimiter = ",", $enclosure = '"');
 $csvFromXml->write($outputFileName);

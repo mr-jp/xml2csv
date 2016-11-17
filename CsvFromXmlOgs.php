@@ -51,33 +51,70 @@ class CsvFromXmlOgs extends CsvFromXml
      */
     protected function processRow(&$csvRow, $header, $value)
     {
-        $string = $newValue = $value;
+        $string = $newValue = $this->cleanValue($value);
 
         if ($header == 'State') {
-            switch ($value) {
-                case "Transported":
-                    $newValue = 'Closed';
-                    $resolution = 'Behoben';
-                    $csvRow["Resolution"] = 'Behoben';
-                    break;
+            $this->convertState($csvRow, $value, $newValue);
+        }
 
-                case "Obsolete":
-                    $newValue = 'Closed';
-                    $csvRow["Resolution"] = 'Wird nicht behoben';
-                    break;
-
-                case "Duplicate":
-                    $newValue = 'Closed';
-                    $csvRow["Resolution"] = 'Duplikat';
-                    break;
-
-                default:
-                    $csvRow["Resolution"] = 'nicht erledigt';
-                    break;
-            }
+        if (in_array($header, ['Resolved', 'Created', 'Updated'])) {
+            $newValue = $this->convertDate($value);
         }
 
         //Add to the row
         $csvRow[$header] = $newValue;
+    }
+
+    /**
+     * Change Some special characters
+     * @param  string $value Value
+     * @return string        New Value
+     */
+    private function cleanValue($value)
+    {
+        $value = str_replace("„", '"', $value);
+        $value = str_replace("“", '"', $value);
+        return $value;
+    }
+
+    /**
+     * Modify state
+     * @param  array &$csvRow   Current CSV row
+     * @param  string $value    Value
+     * @param  string &$newValue New Value
+     */
+    private function convertState(&$csvRow, $value, &$newValue)
+    {
+        switch ($value) {
+            case "Transported":
+                $newValue = 'Closed';
+                $csvRow["Resolution"] = 'Behoben';
+                break;
+
+            case "Obsolete":
+                $newValue = 'Closed';
+                $csvRow["Resolution"] = 'Wird nicht behoben';
+                break;
+
+            case "Duplicate":
+                $newValue = 'Closed';
+                $csvRow["Resolution"] = 'Duplikat';
+                break;
+
+            default:
+                $csvRow["Resolution"] = 'nicht erledigt';
+                break;
+        }
+    }
+
+    /**
+     * Convert from Youtrack Timestamp to a readable time
+     * @param  string $value Youtrack timestamp, which is milliseconds since 01.01.1970
+     * @return string        Date in requested format (dd.MM.yyyy HH:mm:ss)
+     */
+    private function convertDate($value)
+    {
+        $seconds = $value / 1000;
+        return date('d.m.Y H:i:s', $seconds);
     }
 }
