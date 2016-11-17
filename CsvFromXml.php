@@ -71,19 +71,22 @@ class CsvFromXml
 
     public function write(String $filename)
     {
-        $resource = fopen($filename, 'w');
-        fprintf($resource, chr(0xEF).chr(0xBB).chr(0xBF));
+        //Only print if the array is not empty
+        if (sizeof($this->csvArray) > 1) {
+            $resource = fopen($filename, 'w');
+            fprintf($resource, chr(0xEF).chr(0xBB).chr(0xBF));
 
-        //output header row
-        $firstItem = $this->csvArray[0];
-        fputcsv($resource, array_keys($firstItem), $this->delimiter, $this->enclosure, $this->escape_char);
+            //output header row
+            $firstItem = $this->csvArray[0];
+            fputcsv($resource, array_keys($firstItem), $this->delimiter, $this->enclosure, $this->escape_char);
 
-        //output data
-        foreach ($this->csvArray as $row) {
-            fputcsv($resource, $row, $this->delimiter, $this->enclosure, $this->escape_char);
+            //output data
+            foreach ($this->csvArray as $row) {
+                fputcsv($resource, $row, $this->delimiter, $this->enclosure, $this->escape_char);
+            }
+
+            //Close resource
+            fclose($resource);
         }
-
-        //Close resource
-        fclose($resource);
     }
 }

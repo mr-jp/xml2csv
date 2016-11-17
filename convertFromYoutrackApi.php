@@ -9,7 +9,7 @@ spl_autoload_register(function ($class_name) {
     $filter = "-feature";
     $project = 'OGS';
     $step = '100'; //how many issues to export at once from the API
-    $exportFolder = '/export';
+    $exportFolder = 'export';
 
 //define fields [key and value] to read from XML and convert to CSV columns
 $fields = [
@@ -33,15 +33,20 @@ $fields = [
     'description' => 'Description',
 ];
 
+//Display to console
+ob_start();
+
 //Get issue count
+echo "Getting number of Youtrack issues ...\n";flush();ob_flush();
 $youtrackIssueCount = new YoutrackIssueCount($configFilename);
 $issueCount = $youtrackIssueCount->getCount();
+echo "{$issueCount} issue(s)\n";
 
 //Export with steps
 for ($i = 0; $i < $issueCount; $i += $step) {
     $start = $i;
     $end = $i + $step - 1;
-    $outputFilename = "ogs_export_{$start}_to_{$end}.csv";
+    $outputFilename = $exportFolder .'/'. "ogs_export_{$start}_to_{$end}.csv";
     // echo "$start to $end \n";
 
     $after = $start;
@@ -52,7 +57,16 @@ for ($i = 0; $i < $issueCount; $i += $step) {
     $xmlParser = new XmlParser($source);
     $xml = $xmlParser->parse();
 
+    //Delete file if exists
+    @unlink($outputFilename);
+
     // Convert to CSV and write to file
     $csvFromXml = new CsvFromXmlOgs($xml, $fields, $delimiter = ",", $enclosure = '"');
     $csvFromXml->write($outputFilename);
+
+    //display output to console
+    echo "Writing: {$outputFilename} \n";
+    flush();ob_flush();
 }
+
+echo "Completed!\n";
