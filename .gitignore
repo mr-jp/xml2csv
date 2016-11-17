@@ -3,3 +3,4 @@
 *.~lock.output.csv#
 youtrack.txt
 *.config
+/export

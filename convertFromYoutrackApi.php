@@ -5,13 +5,11 @@ spl_autoload_register(function ($class_name) {
 });
 
 // Read from Youtrack API
-$source = new YoutrackApiReader("youtrack.config");
-
-exit;
-
-// Parse to XML
-$xmlParser = new XmlParser($source);
-$xml = $xmlParser->parse();
+    $configFilename = "youtrack.config";
+    $filter = "-feature";
+    $project = 'OGS';
+    $step = '100'; //how many issues to export at once from the API
+    $exportFolder = '/export';
 
 //define fields [key and value] to read from XML and convert to CSV columns
 $fields = [
@@ -35,7 +33,26 @@ $fields = [
     'description' => 'Description',
 ];
 
-// Convert to CSV and write to file
-// $csvFromXml = new CsvFromXml($xml, $fields, $delimiter = ",", $enclosure = "^");
-$csvFromXml = new CsvFromXmlOgs($xml, $fields, $delimiter = ",", $enclosure = '"');
-$csvFromXml->write($outputFileName);
+//Get issue count
+$youtrackIssueCount = new YoutrackIssueCount($configFilename);
+$issueCount = $youtrackIssueCount->getCount();
+
+//Export with steps
+for ($i = 0; $i < $issueCount; $i += $step) {
+    $start = $i;
+    $end = $i + $step - 1;
+    $outputFilename = "ogs_export_{$start}_to_{$end}.csv";
+    // echo "$start to $end \n";
+
+    $after = $start;
+    $max = $step;
+    $source = new YoutrackIssuesReader($configFilename, $after, $max, $project, $filter);
+
+    // Parse to XML
+    $xmlParser = new XmlParser($source);
+    $xml = $xmlParser->parse();
+
+    // Convert to CSV and write to file
+    $csvFromXml = new CsvFromXmlOgs($xml, $fields, $delimiter = ",", $enclosure = '"');
+    $csvFromXml->write($outputFilename);
+}

@@ -1,20 +1,22 @@
 <?php
-
-class YoutrackApiReader implements InputInterface
+/**
+ * Youtrack API
+ */
+class YoutrackApi
 {
-    private $configFileName;
+    protected $configFileName;
     private $authUrl;
     private $serviceId;
     private $serviceSecret;
     private $serviceScope;
-    private $baseUrl;
+    protected $baseUrl;
     private $username;
     private $password;
-    private $token;
+    protected $token;
 
     /**
      * Constructor
-     * @param String $configFileName Configuration file name
+     * @param String    $configFileName Configuration Filename
      */
     public function __construct(String $configFileName)
     {
@@ -25,7 +27,7 @@ class YoutrackApiReader implements InputInterface
 
     private function loadConfig()
     {
-        $this->configFileName = 'youtrack.config';
+        $this->configFileName = $this->configFileName;
         $resource = fopen($this->configFileName, 'r');
         $contents = fread($resource, filesize($this->configFileName));
         $contentsJSON = json_decode($contents);
@@ -74,16 +76,6 @@ class YoutrackApiReader implements InputInterface
         curl_close($ch);
 
         $data = json_decode($result);
-        return $data['access_token'];
-    }
-
-    public function read()
-    {
-        // read data here
-    }
-
-    public function __destruct()
-    {
-
+        return $data->access_token;
     }
 }
