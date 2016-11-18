@@ -49,7 +49,6 @@ This will export multiple files into an export folder, so don't forget to create
 Todo
 ---
 * Array of column and fields should be read from a configuration file, instead of being hardcoded into convert.php
-* Generalize API calls so other sources can be used also
 * Generalize read XML for other formats. See if we can specify the name of the element to get children from (currently, it's reading only "issues")
 * Step option for API call should be a console argument
 
