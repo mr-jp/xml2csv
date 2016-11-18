@@ -39,7 +39,7 @@ class YoutrackApi
     {
         $this->configFileName = $configFileName;
         $this->loadConfig();
-        // $this->getOrRefreshToken();
+        $this->getOrRefreshToken();
     }
 
     private function loadConfig()
@@ -135,6 +135,9 @@ class YoutrackApi
      */
     public function getIssues(int $after = 0, int $max = 10, string $project = 'OGS', $filter = "")
     {
+        //Refresh token if needed
+        $this->getOrRefreshToken();
+
         //Call API
         $url = $this->baseUrl . "/rest/issue/byproject/{$project}?max={$max}&after={$after}&filter={$filter}";
         $headers = [
