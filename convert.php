@@ -9,11 +9,10 @@ $inputFileName = $argv[1];
 $outputFileName = $argv[2];
 
 // Read from File
-$source = new FileReader($inputFileName);
+$source = MyHelper::readFileAsString($inputFileName);
 
 // Parse to XML
-$xmlParser = new XmlParser($source);
-$xml = $xmlParser->parse();
+$xml = MyHelper::parseXml($source);
 
 //define fields [key and value] to read from XML and convert to CSV columns
 $fields = [

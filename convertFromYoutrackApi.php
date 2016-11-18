@@ -36,10 +36,12 @@ $fields = [
 //Display to console
 ob_start();
 
+//Initialize YoutrackApi object
+$youtrackApi = YoutrackApi::getInstance($configFilename);
+
 //Get issue count
 echo "Getting number of Youtrack issues ...\n";flush();ob_flush();
-$youtrackIssueCount = new YoutrackIssueCount($configFilename);
-$issueCount = $youtrackIssueCount->getCount();
+$issueCount = $youtrackApi->getIssueCount($filter);
 echo "{$issueCount} issue(s)\n";
 
 //Export with steps
@@ -47,15 +49,13 @@ for ($i = 0; $i < $issueCount; $i += $step) {
     $start = $i;
     $end = $i + $step - 1;
     $outputFilename = $exportFolder .'/'. "ogs_export_{$start}_to_{$end}.csv";
-    // echo "$start to $end \n";
 
     $after = $start;
     $max = $step;
-    $source = new YoutrackIssuesReader($configFilename, $after, $max, $project, $filter);
+    $source = $youtrackApi->getIssues($after, $max, $project, $filter);
 
     // Parse to XML
-    $xmlParser = new XmlParser($source);
-    $xml = $xmlParser->parse();
+    $xml = MyHelper::parseXml($source);
 
     //Delete file if exists
     @unlink($outputFilename);
